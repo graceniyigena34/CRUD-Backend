@@ -1,47 +1,27 @@
-import { Router } from "express";
-import { categories, createCategory, Category } from "../src/models/categories";
+import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
 
-const router = Router();
+import categoryRoutes from "./routes/categories";
+import productRoutes from "./routes/product";
+import cartRoutes from "./routes/cart";
 
-// GET all categories
-router.get("/", (_, res) => {
-  res.json(categories);
+const app = express();
+const PORT = 3000;
+
+app.use(bodyParser.json());
+
+// Routes
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+
+// Default route
+app.get("/", (_req: Request, res: Response) => {
+  res.send("E-commerce API is running!");
 });
 
-// GET category by ID
-router.get("/:id", (req, res) => {
-  const category = categories.find(c => c.id === req.params.id);
-  if (!category) return res.status(404).json({ message: "Category not found" });
-  res.json(category);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// POST create category
-router.post("/", (req, res) => {
-  const { name, description } = req.body;
-  if (!name) return res.status(400).json({ message: "Name is required" });
-  const newCategory: Category = createCategory(name, description);
-  res.status(201).json(newCategory);
-});
-
-// PUT update category
-router.put("/:id", (req, res) => {
-  const category = categories.find(c => c.id === req.params.id);
-  if (!category) return res.status(404).json({ message: "Category not found" });
-
-  category.name = req.body.name ?? category.name;
-  category.description = req.body.description ?? category.description;
-
-  res.json(category);
-});
-
-// DELETE category
-router.delete("/:id", (req, res) => {
-  const index = categories.findIndex(c => c.id === req.params.id);
-  if (index === -1) return res.status(404).json({ message: "Category not found" });
-
-  categories.splice(index, 1);
-  res.json({ message: "Category deleted" });
-});
-
-export default router;
 
