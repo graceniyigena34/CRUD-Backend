@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { CategoryModel } from "../models/categories";
-import { v4 as uuidv4 } from "uuid";
 
 // Create Category
 export const createCategory = async (req: Request, res: Response) => {
@@ -8,7 +7,6 @@ export const createCategory = async (req: Request, res: Response) => {
     const { name, description } = req.body;
 
     const category = new CategoryModel({
-      id: uuidv4(),
       name,
       description
     });
@@ -34,8 +32,8 @@ export const getCategories = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updatedCategory = await CategoryModel.findOneAndUpdate(
-      { id },
+    const updatedCategory = await CategoryModel.findByIdAndUpdate(
+      id,
       req.body,
       { new: true }
     );
@@ -54,7 +52,7 @@ export const updateCategory = async (req: Request, res: Response) => {
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const deletedCategory = await CategoryModel.findOneAndDelete({ id });
+    const deletedCategory = await CategoryModel.findByIdAndDelete(id);
     
     if (!deletedCategory) {
       return res.status(404).json({ message: "Category not found" });

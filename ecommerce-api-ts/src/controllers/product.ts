@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { ProductModel } from "../models/product";
-import { v4 as uuidv4 } from "uuid";
 
 // Create Product
 export const createProduct = async (req: Request, res: Response) => {
@@ -8,7 +7,6 @@ export const createProduct = async (req: Request, res: Response) => {
     const { name, price, categoryId, description, inStock, quantity } = req.body;
 
     const product = new ProductModel({
-      id: uuidv4(),
       name,
       price,
       categoryId,
@@ -38,8 +36,8 @@ export const getProducts = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updatedProduct = await ProductModel.findOneAndUpdate(
-      { id },
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      id,
       req.body,
       { new: true }
     );
@@ -58,7 +56,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const deletedProduct = await ProductModel.findOneAndDelete({ id });
+    const deletedProduct = await ProductModel.findByIdAndDelete(id);
     
     if (!deletedProduct) {
       return res.status(404).json({ message: "Product not found" });

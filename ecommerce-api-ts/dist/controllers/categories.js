@@ -11,13 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategory = exports.updateCategory = exports.getCategories = exports.createCategory = void 0;
 const categories_1 = require("../models/categories");
-const uuid_1 = require("uuid");
 // Create Category
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, description } = req.body;
         const category = new categories_1.CategoryModel({
-            id: (0, uuid_1.v4)(),
             name,
             description
         });
@@ -44,7 +42,7 @@ exports.getCategories = getCategories;
 const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const updatedCategory = yield categories_1.CategoryModel.findOneAndUpdate({ id }, req.body, { new: true });
+        const updatedCategory = yield categories_1.CategoryModel.findByIdAndUpdate(id, req.body, { new: true });
         if (!updatedCategory) {
             return res.status(404).json({ message: "Category not found" });
         }
@@ -59,7 +57,7 @@ exports.updateCategory = updateCategory;
 const deleteCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const deletedCategory = yield categories_1.CategoryModel.findOneAndDelete({ id });
+        const deletedCategory = yield categories_1.CategoryModel.findByIdAndDelete(id);
         if (!deletedCategory) {
             return res.status(404).json({ message: "Category not found" });
         }

@@ -11,13 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCartItem = exports.updateCartItem = exports.getCart = exports.addToCart = void 0;
 const cart_1 = require("../models/cart");
-const uuid_1 = require("uuid");
 // Add to Cart
 const addToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { productId, quantity } = req.body;
         const cartItem = new cart_1.CartModel({
-            id: (0, uuid_1.v4)(),
             productId,
             quantity
         });
@@ -36,7 +34,7 @@ const getCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.json(cartItems);
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to fetch cart" });
+        res.status(500).json({ message: "Failed to fetch cart", error });
     }
 });
 exports.getCart = getCart;
@@ -45,7 +43,7 @@ const updateCartItem = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id } = req.params;
         const { productId, quantity } = req.body;
-        const updatedItem = yield cart_1.CartModel.findOneAndUpdate({ id }, { productId, quantity }, { new: true });
+        const updatedItem = yield cart_1.CartModel.findByIdAndUpdate(id, { productId, quantity }, { new: true });
         if (!updatedItem) {
             return res.status(404).json({ message: "Cart item not found" });
         }
@@ -60,7 +58,7 @@ exports.updateCartItem = updateCartItem;
 const deleteCartItem = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const deletedItem = yield cart_1.CartModel.findOneAndDelete({ id });
+        const deletedItem = yield cart_1.CartModel.findByIdAndDelete(id);
         if (!deletedItem) {
             return res.status(404).json({ message: "Cart item not found" });
         }

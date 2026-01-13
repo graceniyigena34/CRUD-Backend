@@ -11,13 +11,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.getProducts = exports.createProduct = void 0;
 const product_1 = require("../models/product");
-const uuid_1 = require("uuid");
 // Create Product
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, price, categoryId, description, inStock, quantity } = req.body;
         const product = new product_1.ProductModel({
-            id: (0, uuid_1.v4)(),
             name,
             price,
             categoryId,
@@ -48,7 +46,7 @@ exports.getProducts = getProducts;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const updatedProduct = yield product_1.ProductModel.findOneAndUpdate({ id }, req.body, { new: true });
+        const updatedProduct = yield product_1.ProductModel.findByIdAndUpdate(id, req.body, { new: true });
         if (!updatedProduct) {
             return res.status(404).json({ message: "Product not found" });
         }
@@ -63,7 +61,7 @@ exports.updateProduct = updateProduct;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const deletedProduct = yield product_1.ProductModel.findOneAndDelete({ id });
+        const deletedProduct = yield product_1.ProductModel.findByIdAndDelete(id);
         if (!deletedProduct) {
             return res.status(404).json({ message: "Product not found" });
         }

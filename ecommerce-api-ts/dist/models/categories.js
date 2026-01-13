@@ -36,7 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoryModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const categorySchema = new mongoose_1.Schema({
-    id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     description: { type: String }
 });

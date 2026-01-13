@@ -36,7 +36,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CartModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const cartSchema = new mongoose_1.Schema({
-    id: { type: String, required: true, unique: true },
     productId: { type: String, required: true },
     quantity: { type: Number, required: true }
 });
