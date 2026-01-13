@@ -1,15 +1,15 @@
-import { v4 as uuidv4 } from "uuid";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface Category {
+export interface ICategory extends Document {
   id: string;
   name: string;
   description?: string;
 }
 
-export const categories: Category[] = [];
+const categorySchema = new Schema<ICategory>({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  description: { type: String }
+});
 
-export const createCategory = (name: string, description?: string): Category => {
-  const newCategory: Category = { id: uuidv4(), name, description };
-  categories.push(newCategory);
-  return newCategory;
-};
+export const CategoryModel = mongoose.model<ICategory>("Category", categorySchema);

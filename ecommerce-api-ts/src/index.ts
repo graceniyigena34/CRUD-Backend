@@ -1,14 +1,18 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import connectDB from "./config/db";
 
 import categoryRoutes from "./routes/categories";
 import productRoutes from "./routes/product";
 import cartRoutes from "./routes/cart";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
+
+//connect DB
+connectDB();
 
 // Routes
 app.use("/api/categories", categoryRoutes);

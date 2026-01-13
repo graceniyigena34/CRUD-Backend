@@ -1,14 +1,15 @@
-import { v4 as uuidv4 } from "uuid";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface CartItem {
+export interface ICart extends Document {
   id: string;
   productId: string;
   quantity: number;
 }
 
-export interface Cart {
-  userId: string;
-  items: CartItem[];
-}
+const cartSchema = new Schema<ICart>({
+  id: { type: String, required: true, unique: true },
+  productId: { type: String, required: true },
+  quantity: { type: Number, required: true }
+});
 
-export const carts: Cart[] = [];
+export const CartModel = mongoose.model<ICart>("Cart", cartSchema);

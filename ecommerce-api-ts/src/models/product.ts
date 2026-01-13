@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from "uuid";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface Product {
+export interface IProduct extends Document {
   id: string;
   name: string;
   price: number;
@@ -10,10 +10,14 @@ export interface Product {
   quantity: number;
 }
 
-export const products: Product[] = [];
+const productSchema = new Schema<IProduct>({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String },
+  categoryId: { type: String, required: true },
+  inStock: { type: Boolean, default: true },
+  quantity: { type: Number, required: true }
+});
 
-export const createProduct = (data: Omit<Product, "id">): Product => {
-  const newProduct: Product = { id: uuidv4(), ...data };
-  products.push(newProduct);
-  return newProduct;
-};
+export const ProductModel = mongoose.model<IProduct>("Product", productSchema);
