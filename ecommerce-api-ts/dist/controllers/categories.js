@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategories = exports.createCategory = void 0;
+exports.deleteCategory = exports.updateCategory = exports.getCategories = exports.createCategory = void 0;
 const categories_1 = require("../models/categories");
 const uuid_1 = require("uuid");
 // Create Category
@@ -36,7 +36,37 @@ const getCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.json(categories);
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to fetch categories" });
+        res.status(500).json({ message: "Failed to fetch categories", error });
     }
 });
 exports.getCategories = getCategories;
+// Update Category
+const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const updatedCategory = yield categories_1.CategoryModel.findOneAndUpdate({ id }, req.body, { new: true });
+        if (!updatedCategory) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+        res.json(updatedCategory);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Failed to update category", error });
+    }
+});
+exports.updateCategory = updateCategory;
+// Delete Category
+const deleteCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const deletedCategory = yield categories_1.CategoryModel.findOneAndDelete({ id });
+        if (!deletedCategory) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+        res.json({ message: "Category deleted" });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Failed to delete category", error });
+    }
+});
+exports.deleteCategory = deleteCategory;
