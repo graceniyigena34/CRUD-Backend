@@ -362,14 +362,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"E-commerce App" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Password Reset Request",
       html: `
         <h2>Password Reset Request</h2>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetUrl}">Reset Password</a>
-        <p>This link will expire in 1 hour.</p>
+        <p>Hello ${user.firstName},</p>
+        <p>You requested a password reset. Use the token below in Swagger or your API client:</p>
+        <div style="background-color: #f4f4f4; padding: 15px; margin: 10px 0; border-radius: 5px;">
+          <strong>Reset Token:</strong><br>
+          <code style="font-size: 14px; word-break: break-all;">${resetToken}</code>
+        </div>
+        <p>Or click this link: <a href="${resetUrl}">Reset Password</a></p>
+        <p><strong>This token will expire in 1 hour.</strong></p>
+        <p>If you didn't request this, please ignore this email.</p>
       `
     };
 
