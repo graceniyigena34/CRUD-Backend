@@ -9,7 +9,8 @@ import {
   updateProfile,
   changePassword,
   deleteAccount
-} from "../controllers/auth"; // make sure this matches your controller file
+} from "../controllers/auth";
+ // make sure this matches your controller file
 import { authenticateToken } from "../middleware/auth"; // middleware to protect routes
 
 const router = Router();
