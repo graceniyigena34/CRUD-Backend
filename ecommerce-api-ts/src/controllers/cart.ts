@@ -2,6 +2,51 @@ import { Request, Response } from "express";
 import { CartModel } from "../models/cart";
 import { ProductModel } from "../models/product";
 
+/**
+ * @swagger
+ * tags:
+ *   name: Cart
+ *   description: Shopping cart management
+ */
+
+/**
+ * @swagger
+ * /api/cart:
+ *   post:
+ *     summary: Add item to cart
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *               - productId
+ *               - quantity
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 example: 64d2bfe4e0c8b2f1a2c9d5b6
+ *               productId:
+ *                 type: string
+ *                 example: 64d2bfe4e0c8b2f1a2c9d5b7
+ *               quantity:
+ *                 type: number
+ *                 example: 2
+ *     responses:
+ *       201:
+ *         description: Item added to cart successfully
+ *       200:
+ *         description: Item quantity updated in cart
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Failed to add to cart
+ */
 // Add to Cart
 export const addToCart = async (req: Request, res: Response) => {
   try {
@@ -35,6 +80,42 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/cart/user/{userId}:
+ *   get:
+ *     summary: Get cart items by user
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 64d2bfe4e0c8b2f1a2c9d5b6
+ *     responses:
+ *       200:
+ *         description: Cart items retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   userId:
+ *                     type: string
+ *                   productId:
+ *                     type: object
+ *                   quantity:
+ *                     type: number
+ *       500:
+ *         description: Failed to fetch cart
+ */
 // Get Cart Items by User
 export const getCartByUser = async (req: Request, res: Response) => {
   try {
@@ -46,6 +127,41 @@ export const getCartByUser = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/cart/{id}:
+ *   put:
+ *     summary: Update cart item quantity
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 64d2bfe4e0c8b2f1a2c9d5b8
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - quantity
+ *             properties:
+ *               quantity:
+ *                 type: number
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Cart item updated successfully
+ *       404:
+ *         description: Cart item not found
+ *       500:
+ *         description: Failed to update cart item
+ */
 // Update Cart Item
 export const updateCartItem = async (req: Request, res: Response) => {
   try {
@@ -68,6 +184,37 @@ export const updateCartItem = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/cart/{id}:
+ *   delete:
+ *     summary: Delete cart item
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 64d2bfe4e0c8b2f1a2c9d5b8
+ *     responses:
+ *       200:
+ *         description: Item removed from cart
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Item removed from cart
+ *       404:
+ *         description: Cart item not found
+ *       500:
+ *         description: Failed to delete cart item
+ */
 // Delete Cart Item
 export const deleteCartItem = async (req: Request, res: Response) => {
   try {
@@ -84,6 +231,35 @@ export const deleteCartItem = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/cart/user/{userId}:
+ *   delete:
+ *     summary: Clear entire cart for user
+ *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 64d2bfe4e0c8b2f1a2c9d5b6
+ *     responses:
+ *       200:
+ *         description: Cart cleared successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cart cleared successfully
+ *       500:
+ *         description: Failed to clear cart
+ */
 // Clear Cart
 export const clearCart = async (req: Request, res: Response) => {
   try {
