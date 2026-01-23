@@ -6,12 +6,17 @@ export const createProduct = async (req: Request, res: Response) => {
   try {
     const { name, description, price, categoryId, stock, imageUrl } = req.body;
 
+    // Validate required fields
+    if (!name || !price) {
+      return res.status(400).json({ message: "Name and price are required" });
+    }
+
     const product = new ProductModel({
       name,
       description,
       price,
       categoryId,
-      stock,
+      stock: stock || 0,
       imageUrl
     });
 

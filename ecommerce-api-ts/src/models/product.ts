@@ -4,7 +4,7 @@ export interface IProduct extends Document {
   name: string;
   description?: string;
   price: number;
-  categoryId: mongoose.Types.ObjectId;
+  categoryId?: mongoose.Types.ObjectId;
   stock: number;
   imageUrl?: string;
   isActive: boolean;
@@ -16,7 +16,7 @@ const productSchema = new Schema<IProduct>({
   name: { type: String, required: true },
   description: { type: String },
   price: { type: Number, required: true },
-  categoryId: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+  categoryId: { type: Schema.Types.ObjectId, ref: "Category" },
   stock: { type: Number, required: true, default: 0 },
   imageUrl: { type: String },
   isActive: { type: Boolean, default: true }
