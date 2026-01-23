@@ -6,7 +6,11 @@ import { UserModel } from "../models/User";
 import { TokenBlacklistModel } from "../models/TokenBlacklist";
 import { hashPassword, comparePassword } from "../utils/hashpassword";
 import { AuthRequest } from "../middleware/auth";
+import dotenv from "dotenv";
 
+
+
+dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_here";
 
 // Email transporter
@@ -23,6 +27,12 @@ const transporter = nodemailer.createTransport({
 
 /**
  * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  * tags:
  *   name: Auth
  *   description: Authentication and user management
@@ -182,6 +192,51 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: strongpassword123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 token:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Login failed
+ */
 // Login User
 export const login = async (req: Request, res: Response) => {
   try {
@@ -214,6 +269,30 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user and blacklist token
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful
+ *       401:
+ *         description: Access token required
+ *       500:
+ *         description: Logout failed
+ */
 // Logout User
 export const logout = async (req: AuthRequest, res: Response) => {
   try {
@@ -230,6 +309,41 @@ export const logout = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/forgot-password:
+ *   post:
+ *     summary: Send password reset email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
+ *     responses:
+ *       200:
+ *         description: Password reset email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password reset email sent
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Failed to send reset email
+ */
 // Forgot Password
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
@@ -267,6 +381,45 @@ export const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Reset password with token and send confirmation email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *               - newPassword
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 example: abc123def456ghi789
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: newstrongpassword123
+ *     responses:
+ *       200:
+ *         description: Password reset successful and confirmation email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password reset successful
+ *       400:
+ *         description: Invalid or expired reset token
+ *       500:
+ *         description: Password reset failed
+ */
 // Reset Password
 export const resetPassword = async (req: Request, res: Response) => {
   try {
@@ -287,12 +440,59 @@ export const resetPassword = async (req: Request, res: Response) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    // Send password reset confirmation email
+    const mailOptions = {
+      from: `"E-commerce App" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Password Reset Successful",
+      html: `
+        <h2>Password Reset Successful</h2>
+        <p>Hello ${user.firstName},</p>
+        <p>Your password has been successfully reset.</p>
+        <p>If you did not make this change, please contact support immediately.</p>
+        <p>Thank you!</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
     res.json({ message: "Password reset successful" });
   } catch (error) {
     res.status(500).json({ message: "Password reset failed", error });
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   get:
+ *     summary: Get user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                 firstName:
+ *                   type: string
+ *                 lastName:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *       401:
+ *         description: Access token required
+ *       404:
+ *         description: User not found
+ */
 // Get User Profile
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -306,6 +506,39 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: John
+ *               lastName:
+ *                 type: string
+ *                 example: Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john.updated@example.com
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Access token required
+ *       404:
+ *         description: User not found
+ */
 // Update User Profile
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -326,6 +559,42 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   put:
+ *     summary: Change user password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - currentPassword
+ *               - newPassword
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: oldpassword123
+ *               newPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: newpassword123
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Current password is incorrect
+ *       401:
+ *         description: Access token required
+ *       404:
+ *         description: User not found
+ */
 // Change Password
 export const changePassword = async (req: AuthRequest, res: Response) => {
   try {
@@ -351,6 +620,32 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/auth/account:
+ *   delete:
+ *     summary: Delete user account
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account deleted successfully
+ *       401:
+ *         description: Access token required
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Failed to delete account
+ */
 // Delete Account
 export const deleteAccount = async (req: AuthRequest, res: Response) => {
   try {
