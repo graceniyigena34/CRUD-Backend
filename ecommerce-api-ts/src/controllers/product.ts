@@ -4,15 +4,15 @@ import { ProductModel } from "../models/product";
 // Create Product
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const { name, price, categoryId, description, inStock, quantity } = req.body;
+    const { name, description, price, categoryId, stock, imageUrl } = req.body;
 
     const product = new ProductModel({
       name,
+      description,
       price,
       categoryId,
-      description,
-      inStock,
-      quantity
+      stock,
+      imageUrl
     });
 
     await product.save();
@@ -25,10 +25,26 @@ export const createProduct = async (req: Request, res: Response) => {
 // Get All Products
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await ProductModel.find();
+    const products = await ProductModel.find({ isActive: true }).populate("categoryId", "name");
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch products", error });
+  }
+};
+
+// Get Product by ID
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const product = await ProductModel.findById(id).populate("categoryId", "name");
+    
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch product", error });
   }
 };
 
@@ -40,7 +56,7 @@ export const updateProduct = async (req: Request, res: Response) => {
       id,
       req.body,
       { new: true }
-    );
+    ).populate("categoryId", "name");
     
     if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
@@ -62,7 +78,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Product not found" });
     }
     
-    res.json({ message: "Product deleted" });
+    res.json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete product", error });
   }
