@@ -44,4 +44,20 @@ export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction
   next();
 };
 
+// Vendor or Admin Middleware
+export const requireVendorOrAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== "vendor" && req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Vendor or Admin access required" });
+  }
+  next();
+};
+
+// Customer Access Middleware
+export const requireCustomer = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== "customer") {
+    return res.status(403).json({ message: "Customer access required" });
+  }
+  next();
+};
+
 export { AuthRequest };

@@ -2,8 +2,14 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IOrder extends Document {
   userId: mongoose.Types.ObjectId;
+  items: {
+    productId: mongoose.Types.ObjectId;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
   totalAmount: number;
-  status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   shippingAddress: string;
   paymentMethod: string;
   isPaid: boolean;
@@ -13,10 +19,16 @@ export interface IOrder extends Document {
 
 const orderSchema = new Schema<IOrder>({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  items: [{
+    productId: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+    name: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true }
+  }],
   totalAmount: { type: Number, required: true },
   status: { 
     type: String, 
-    enum: ["pending", "paid", "shipped", "delivered", "cancelled"], 
+    enum: ["pending", "confirmed", "shipped", "delivered", "cancelled"], 
     default: "pending" 
   },
   shippingAddress: { type: String },

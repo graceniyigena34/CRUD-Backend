@@ -1,21 +1,17 @@
 import { Router } from "express";
-import { createOrder, getOrders, getOrderById, updateOrderStatus, deleteOrder } from "../controllers/Order";
+import { createOrder, getUserOrders, getUserOrder, cancelOrder, getAllOrders, updateOrderStatus } from "../controllers/Order";
+import { authenticateToken, requireAdmin } from "../middleware/auth";
 
 const router = Router();
 
-// POST - Create order
-router.post("/", createOrder);
+// Customer Routes (Protected)
+router.post("/", authenticateToken, createOrder);
+router.get("/", authenticateToken, getUserOrders);
+router.get("/:id", authenticateToken, getUserOrder);
+router.patch("/:id/cancel", authenticateToken, cancelOrder);
 
-// GET - Get all orders
-router.get("/", getOrders);
-
-// GET - Get order by id
-router.get("/:id", getOrderById);
-
-// PUT - Update order status
-router.put("/:id", updateOrderStatus);
-
-// DELETE - Delete order
-router.delete("/:id", deleteOrder);
+// Admin Routes (Protected + Admin Role)
+router.get("/admin/orders", authenticateToken, requireAdmin, getAllOrders);
+router.patch("/admin/orders/:id/status", authenticateToken, requireAdmin, updateOrderStatus);
 
 export default router;
