@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ProductModel } from "../models/product";
+import mongoose from "mongoose";
 
 // Create Product
 export const createProduct = async (req: Request, res: Response) => {
@@ -57,11 +58,16 @@ export const getProductById = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+    
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       id,
       req.body,
-      { new: true }
-    ).populate("categoryId", "name");
+      { new: true, runValidators: true }
+    );
     
     if (!updatedProduct) {
       return res.status(404).json({ message: "Product not found" });
@@ -77,6 +83,11 @@ export const updateProduct = async (req: Request, res: Response) => {
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid product ID" });
+    }
+    
     const deletedProduct = await ProductModel.findByIdAndDelete(id);
     
     if (!deletedProduct) {

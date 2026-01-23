@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import { connectDB } from "./config/db";
 
+import authRoutes from "./routes/auth";
 import categoryRoutes from "./routes/categories";
 import productRoutes from "./routes/product";
 import cartRoutes from "./routes/cart";
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 connectDB();
 
 // Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);

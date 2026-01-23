@@ -7,6 +7,8 @@ export interface IUser extends Document {
   password: string;
   role: "admin" | "customer";
   isActive: boolean;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,7 +19,9 @@ const userSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["admin", "customer"], default: "customer" },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
 }, { timestamps: true });
 
 export const UserModel = mongoose.model<IUser>("User", userSchema);
